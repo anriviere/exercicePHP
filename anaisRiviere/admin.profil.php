@@ -8,14 +8,25 @@ if (!empty($_POST)) {
     }
     elseif (empty($_POST['modifier'])){
         $name = "";
+
         if (!empty($_FILES)) {
             foreach ($_FILES["img"]["error"] as $key => $error) {
                 if ($error == UPLOAD_ERR_OK) {
                     $tmp_name = $_FILES["img"]["tmp_name"][$key];
                     $name = basename($_FILES["img"]["name"][$key]);
                     move_uploaded_file($tmp_name, "img/$name");
+                    
                 }
             }
+        }
+
+        if(!empty($_POST['img_actuelle'])){
+            if(empty($name)){
+                $name = "$_POST[img_actuelle]";
+            }
+                
+            
+            
         }
     
             $_POST["prenom"] = htmlentities($_POST["prenom"], ENT_QUOTES);
@@ -25,7 +36,9 @@ if (!empty($_POST)) {
             $_POST["ville"] = htmlentities($_POST["ville"], ENT_QUOTES);
             $_POST["mail"] = htmlentities($_POST["mail"], ENT_QUOTES);
             $_POST["presentation"] = htmlentities($_POST["presentation"], ENT_QUOTES);
-        
+            
+           
+
             $requeteSQL = "REPLACE INTO profil (id_profil, prenom, nom, adresse, code_postal, ville, mail, presentation, photo_profil)";
             $requeteSQL .= " values ('1','$_POST[prenom]', '$_POST[nom]', '$_POST[adresse]', '$_POST[code_postal]', '$_POST[ville]', '$_POST[mail]', '$_POST[presentation]','img/$name')";
             //echo $requeteSQL;
@@ -45,7 +58,11 @@ if(!empty($_POST['modifier']))
     { 
         $result = $pdo->query("SELECT * FROM profil WHERE deletion_flag = 0 AND id_profil = $_POST[modifier]");
         $profil_modifie = $result->fetch(PDO::FETCH_OBJ);
+
+        
     }
+
+    
 
 ?>
 
@@ -62,6 +79,7 @@ if(!empty($_POST['modifier']))
               <p><?php echo $profil->presentation; ?></p>
               <img src="<?php echo $profil->photo_profil; ?>" class="card-img-top" alt="...">
             </div>
+            <p><?php echo $profil->photo_profil;  ?></p>
             
               <form action="admin.profil.php" method="POST" >
               <button type="submit" name="modifier" value=" <?php echo $profil->id_profil; ?>" class="btn btn-primary">modifier</button>
@@ -119,12 +137,16 @@ if(!empty($_POST['modifier']))
 
         <div class="form-group">
             <label for="titre">Photo</label>
-            <input type="file" class="form-control-file" id="img" name="img[]">
+            <input type="file" id="img" name="img[]"?>">
+            
         <?php
-        if(isset($profil_modifie))
+        if(!empty($_POST['modifier']))
         {?>
             <img src="<?php echo $profil_modifie->photo_profil?>"><br>';
-            <input type="hidden" name="img[]" value="<?php $profil_modifie->photo_profil ?> "><br>';
+            <input type="texte" name="img_actuelle" id="img" value="<?php echo substr($profil_modifie->photo_profil, 4) ; ?> "><br>';
+            
+           
+            
         <?php }?>
         
         </div>

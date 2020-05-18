@@ -4,6 +4,7 @@
 if(isset($_GET['action']) && $_GET['action'] == "deconnexion")
 {
     session_destroy();
+    header("location:connexion.php");
 }
 
 
